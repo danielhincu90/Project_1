@@ -3,19 +3,11 @@ from sqlalchemy.orm import Session
 
 from src.database import get_db
 from src.models import User
-from src.schemas import UserCreate, User as UserSchema
+from src.schemas.user_schemas import UserCreate, User as UserSchema
 from typing import List
 
 router = APIRouter(prefix='/users', tags=['users'])
 
-
-#@router.get("/")
-#async def root():
-#    return {"message": "Hello World"}
-
-#@router.get("/hello/{name}")
-#async def hello(name: str):
-#    return {"message": f"Hello, {name}!"}
 
 @router.post("/", response_model=UserSchema)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
@@ -26,7 +18,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     db_user = User(
         email=user.email,
         username=user.username,
-        hashed_password=user.password  # In real app, hash the password!
+        hashed_password=user.password
     )
     db.add(db_user)
     db.commit()
@@ -64,6 +56,6 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    db.delete(db_user)
+    db_user.is_active = False  # Assuming the User model has an is_active field
     db.commit()
-    return {"message": f"User with id: {user_id}, deleted"}
+    return {"message": f"User with id: {user_id} has been deactivated"}
