@@ -10,3 +10,4 @@ def get_env_or_raise(key: str) -> str:
     return value
 
 DATABASE_URL = get_env_or_raise("DATABASE_URL")
+TG_API=get_env_or_raise("TG_API")
